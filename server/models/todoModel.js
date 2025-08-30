@@ -1,4 +1,5 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
+
 
 const todoSchema = new mongoose.Schema({
     title: {
@@ -8,7 +9,12 @@ const todoSchema = new mongoose.Schema({
     description: {
         type: String,
         required: true
+    },
+    completed: {
+        type: Boolean,
+        default: false
     }
+    
 })
 
 const todoModel = mongoose.model("Todo", todoSchema);
