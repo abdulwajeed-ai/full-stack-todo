@@ -1,6 +1,7 @@
 const express = require("express")
 const app = express()
 const cors = require("cors")
+const todoRouter = require("./routes/todoRoutes")
 
 const connectDB = require("./db/db")
 
@@ -9,6 +10,8 @@ app.use(express.json())
 
 // allowing to different ports of ip use CORS
 app.use(cors())
+
+app.use("/api", todoRouter)
 
 // database connection
 connectDB();

@@ -1,9 +1,10 @@
 const todoModel = require("../models/todoModel");
 const { createTodo, updateTodo } = require("../types");
 
+
 const todo = async (req, res) => {
   const { title, description } = req.body;
-  const parsePayload = createTodo.safeParse(createPayload);
+  const parsePayload = createTodo.safeParse({title, description});
   if (!parsePayload.success) {
     return res.status(411).json({ message: "sent the wrong inputs" });
   }
@@ -32,7 +33,7 @@ const completed = async (req, res) => {
   try {
     await todoModel.update({
         _id: req.body._id
-    })
+    }, completed = true)
   } catch (error) {
     res.status(500).json({ message: "internal server error" });
   }
