@@ -1,10 +1,10 @@
 const todoModel = require("../models/todoModel");
-const { createTodo, updateTodo } = require("../types");
+const { createTodo, updateTodo: updateTodoSchema } = require("../types");
 
-
+// Create a new todo
 const todo = async (req, res) => {
   const { title, description } = req.body;
-  const parsePayload = createTodo.safeParse({title, description});
+  const parsePayload = createTodo.safeParse({ title, description });
   if (!parsePayload.success) {
     return res.status(411).json({ message: "sent the wrong inputs" });
   }
@@ -15,6 +15,8 @@ const todo = async (req, res) => {
     res.status(500).json({ message: "internal server error" });
   }
 };
+
+// Get all todos
 const todos = async (req, res) => {
   try {
     const allTodos = await todoModel.find();
@@ -23,20 +25,50 @@ const todos = async (req, res) => {
     res.status(500).json({ message: "internal server error" });
   }
 };
+
+// Mark todo as completed
 const completed = async (req, res) => {
-  const updatePayload = req.body;
-  const parsePayload = updateTodo.safeParse(updatePayload);
+  const { id } = req.body;
+  const parsePayload = updateTodoSchema.safeParse({ id });
   if (!parsePayload.success) {
     return res.status(411).json({ message: "sent the wrong update inputs" });
   }
 
   try {
-    await todoModel.update({
-        _id: req.body._id
-    }, completed = true)
+    const updated = await todoModel.findByIdAndUpdate(
+      id,
+      { completed: true },
+      { new: true }
+    );
+    res.status(200).json(updated);
   } catch (error) {
     res.status(500).json({ message: "internal server error" });
   }
 };
 
-module.exports = { todo, todos, completed };
+// Delete todo
+const deleteTodo = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await todoModel.findByIdAndDelete(id);
+    res.status(200).json({ message: "todo deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "internal server error" });
+  }
+};
+
+// Update todo (edit)
+const editTodo = async (req, res) => {
+  const { id } = req.params;
+  const updatePayload = req.body;
+  try {
+    const updated = await todoModel.findByIdAndUpdate(id, updatePayload, {
+      new: true,
+    });
+    res.status(200).json(updated);
+  } catch (error) {
+    res.status(500).json({ message: "internal server error" });
+  }
+};
+
+module.exports = { todo, todos, completed, deleteTodo, editTodo };
