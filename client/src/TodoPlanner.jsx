@@ -1,21 +1,33 @@
 import { useForm } from "react-hook-form";
+import axios from "axios";
 
-const TodoPlanner = () => {
+const TodoPlanner = ({ onTodoAdded }) => {
   const { register, handleSubmit, reset } = useForm();
 
   const onSubmit = (data) => {
-    // handle form data here
-    console.log(data);
-    reset();
+    const newTodo = { ...data };
+    axios.post("http://localhost:3000/api/todo", newTodo)
+      .then((response) => {
+        console.log(response.data);
+        reset();
+        if (onTodoAdded) {
+          onTodoAdded();   // tell parent to re-fetch
+        }
+      })
+      .catch((error) => {
+        console.error("Error adding todo:", error);
+      });
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-black p-4">
+    <div className="flex items-center justify-center">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="w-full max-w-sm bg-gray-800 rounded-2xl shadow-lg p-6 flex flex-col gap-5"
       >
-        <h2 className="text-2xl font-bold text-gray-100 text-center mb-2">Add Todo</h2>
+        <h2 className="text-2xl font-bold text-gray-100 text-center mb-2">
+          Add Todo
+        </h2>
         <input
           className="bg-gray-900 text-gray-100 placeholder-gray-400 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-gray-600 transition"
           type="text"
